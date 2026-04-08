@@ -177,8 +177,12 @@ else
   warn_or_fail "Copilot CLI が見つかりません。standalone の 'copilot' コマンドをインストールしてください。"
 fi
 
-if [[ "$COPILOT_KIND" == "standalone" && "$COPILOT_COMMAND" == *.exe ]] && command -v cygpath >/dev/null 2>&1; then
-  COPILOT_ADD_DIR="$(cygpath -w "$repo_root")"
+if [[ "$COPILOT_KIND" == "standalone" && "$COPILOT_COMMAND" == *.exe ]]; then
+  if command -v wslpath >/dev/null 2>&1; then
+    COPILOT_ADD_DIR="$(wslpath -w "$repo_root")"
+  elif command -v cygpath >/dev/null 2>&1; then
+    COPILOT_ADD_DIR="$(cygpath -w "$repo_root")"
+  fi
 fi
 
 refs_summary=""
