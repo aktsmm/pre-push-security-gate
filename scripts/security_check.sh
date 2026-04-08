@@ -45,14 +45,20 @@ warn_or_fail() {
 
 should_check_ref() {
   local local_ref="$1"
+  local remote_ref="$2"
+  local effective_ref="$local_ref"
 
-  if [[ "$local_ref" != refs/heads/* ]]; then
+  if [[ "$effective_ref" != refs/heads/* ]]; then
+    effective_ref="$remote_ref"
+  fi
+
+  if [[ "$effective_ref" != refs/heads/* ]]; then
     return 1
   fi
 
   # Default: check every branch.
   # To limit checks to production branches only, replace this function body with:
-  # case "$local_ref" in
+  # case "$effective_ref" in
   #   refs/heads/main|refs/heads/master) return 0 ;;
   #   *) return 1 ;;
   # esac
@@ -71,13 +77,7 @@ collect_commits() {
   else
     while IFS= read -r commit; do
       [[ -n "$commit" ]] && commits+=("$commit")
-    done < <(git rev-list --reverse "$local_sha" --not --remotes)
-
-    if [[ "${#commits[@]}" -eq 0 ]]; then
-      while IFS= read -r commit; do
-        [[ -n "$commit" ]] && commits+=("$commit")
-      done < <(git rev-list --reverse --max-count=5 "$local_sha")
-    fi
+    done < <(git rev-list --reverse "$local_sha")
   fi
 
   printf '%s\n' "${commits[@]}"
@@ -193,7 +193,7 @@ review_required=0
 while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
   [[ "$local_ref" == "(delete)" ]] && continue
-  should_check_ref "$local_ref" || continue
+  should_check_ref "$local_ref" "$remote_ref" || continue
 
   review_required=1
   refs_summary+="- $local_ref ($local_sha) -> $remote_ref ($remote_sha)\n"

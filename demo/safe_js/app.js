@@ -14,7 +14,7 @@ const server = http.createServer((req, res) => {
 
   res.writeHead(200, {
     "Content-Type": "text/html; charset=utf-8",
-    "X-Content-Type-Options": "nosniff"
+    "X-Content-Type-Options": "nosniff",
   });
   res.end(`<h1>Hello ${name}</h1>`);
 });

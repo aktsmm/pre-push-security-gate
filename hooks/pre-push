@@ -7,11 +7,47 @@ if [[ "${SKIP_COPILOT_SECURITY_HOOK:-0}" == "1" ]]; then
 fi
 
 repo_root="$(git rev-parse --show-toplevel)"
-script_path="$repo_root/scripts/security_check.sh"
+ps_script_path="$repo_root/scripts/security_check.ps1"
+sh_script_path="$repo_root/scripts/security_check.sh"
+ps_command=""
+ps_script_arg="$ps_script_path"
+refs_file_arg=""
+logs_dir="$repo_root/logs"
+mkdir -p "$logs_dir"
+debug_log="$logs_dir/pre-push-invoke-$(date +"%Y%m%d-%H%M%S").log"
 
-if [[ ! -x "$script_path" ]]; then
-  echo "[security-hook] missing executable script: $script_path" >&2
-  echo "[security-hook] run 'bash setup.sh' from the repository root." >&2
+debug_log_write() {
+  printf '%s\n' "$1" >> "$debug_log"
+}
+
+debug_log_write "=== pre-push invocation ==="
+debug_log_write "date=$(date +"%Y-%m-%d %H:%M:%S")"
+debug_log_write "remote_name=${1:-unknown-remote}"
+debug_log_write "remote_url=${2:-unknown-url}"
+debug_log_write "pwd=$(pwd)"
+
+if command -v pwsh.exe >/dev/null 2>&1; then
+  ps_command="pwsh.exe"
+elif command -v pwsh >/dev/null 2>&1; then
+  ps_command="pwsh"
+fi
+
+debug_log_write "ps_command=${ps_command:-none}"
+if [[ -n "$ps_command" ]]; then
+  debug_log_write "ps_command_path=$(command -v "$ps_command")"
+fi
+
+if [[ -n "$ps_command" && ! -f "$ps_script_path" ]]; then
+  debug_log_write "missing PowerShell script: $ps_script_path"
+  echo "[security-hook] missing PowerShell script: $ps_script_path" >&2
+  echo "[security-hook] run './setup.ps1' or 'bash setup.sh' from the repository root." >&2
+  exit 1
+fi
+
+if [[ -z "$ps_command" && ! -x "$sh_script_path" ]]; then
+  debug_log_write "missing fallback shell script: $sh_script_path"
+  echo "[security-hook] missing fallback shell script: $sh_script_path" >&2
+  echo "[security-hook] run './setup.ps1' or 'bash setup.sh' from the repository root." >&2
   exit 1
 fi
 
@@ -21,5 +57,37 @@ refs_file="$(mktemp)"
 trap 'rm -f "$refs_file"' EXIT
 
 cat > "$refs_file"
+debug_log_write "refs_file=$refs_file"
+debug_log_write "refs_contents_begin"
+while IFS= read -r ref_line; do
+  debug_log_write "$ref_line"
+done < "$refs_file"
+debug_log_write "refs_contents_end"
 
-bash "$script_path" "$remote_name" "$remote_url" "$refs_file"
+if [[ -n "$ps_command" ]]; then
+  refs_file_arg="$refs_file"
+
+  if [[ "$ps_command" == *.exe ]]; then
+    if command -v wslpath >/dev/null 2>&1; then
+      ps_script_arg="$(wslpath -w "$ps_script_path")"
+      refs_file_arg="$(wslpath -w "$refs_file")"
+    elif command -v cygpath >/dev/null 2>&1; then
+      ps_script_arg="$(cygpath -w "$ps_script_path")"
+      refs_file_arg="$(cygpath -w "$refs_file")"
+    fi
+  fi
+
+  debug_log_write "engine=PowerShell"
+  debug_log_write "ps_script_arg=$ps_script_arg"
+  debug_log_write "refs_file_arg=$refs_file_arg"
+  "$ps_command" -NoProfile -ExecutionPolicy Bypass -File "$ps_script_arg" "$remote_name" "$remote_url" "$refs_file_arg" < /dev/null
+  child_exit=$?
+  debug_log_write "engine_exit=$child_exit"
+  exit $child_exit
+fi
+
+debug_log_write "engine=bash"
+bash "$sh_script_path" "$remote_name" "$remote_url" "$refs_file" < /dev/null
+child_exit=$?
+debug_log_write "engine_exit=$child_exit"
+exit $child_exit
