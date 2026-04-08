@@ -1,0 +1,94 @@
+<mxfile host="app.diagrams.net" agent="GitHub Copilot" version="24.7.17" type="device">
+  <diagram id="pre-push-security-gate-architecture" name="Architecture">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="group-local" value="Local Repository" style="swimlane;horizontal=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="980" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="group-external" value="External / Remote" style="swimlane;horizontal=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="40" width="460" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="developer" value="Developer&#xa;git push" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="40" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hook" value="hooks/pre-push&#xa;(bash entrypoint)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="220" y="80" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="refs" value="Ref capture&#xa;remote name / URL&#xa;stdin → temp file" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="450" y="80" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="engine" value="scripts/security_check.ps1&#xa;PowerShell 7 primary&#xa;scripts/security_check.sh fallback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="690" y="70" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="collect" value="Commit collection&#xa;git rev-list / git show&#xa;HEAD push aware" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="220" y="220" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="scan" value="Static signals&#xa;regex scan for&#xa;secret / XSS / SSRF / command exec" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="450" y="220" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="copilot" value="GitHub Copilot CLI&#xa;prompt with diff + signals&#xa;SECURITY_CHECK: PASS / FAIL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="group-external">
+          <mxGeometry x="90" y="95" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="decision" value="Decision&#xa;PASS or FAIL" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="730" y="230" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="logs" value="logs/security-*.log&#xa;logs/pre-push-invoke-*.log" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="230" y="380" width="190" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="allow" value="Git push continues" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="group-external">
+          <mxGeometry x="110" y="360" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="remote" value="Remote repository&#xa;GitHub / local bare remote" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-external">
+          <mxGeometry x="90" y="460" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="block" value="Push blocked&#xa;stderr shows findings" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="690" y="380" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="test" value="scripts/test-hook.ps1&#xa;temporary worktree&#xa;+ local bare remote E2E" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="460" y="500" width="230" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="developer" target="hook">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="capture refs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="hook" target="refs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="select engine" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="refs" target="engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="collect commits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="engine" target="collect">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="scan diff" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="collect" target="scan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="prompt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="scan" target="copilot">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="PASS / FAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="copilot" target="decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="write logs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="decision" target="logs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="PASS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="decision" target="allow">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="update remote" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="allow" target="remote">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" value="FAIL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="decision" target="block">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" value="exercise real push path" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="test" target="remote">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" value="installs hook and validates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="test" target="hook">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
