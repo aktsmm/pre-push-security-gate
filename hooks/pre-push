@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${SKIP_COPILOT_SECURITY_HOOK:-0}" == "1" ]]; then
+  echo "[security-hook] skipped because SKIP_COPILOT_SECURITY_HOOK=1" >&2
+  exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+script_path="$repo_root/scripts/security_check.sh"
+
+if [[ ! -x "$script_path" ]]; then
+  echo "[security-hook] missing executable script: $script_path" >&2
+  echo "[security-hook] run 'bash setup.sh' from the repository root." >&2
+  exit 1
+fi
+
+remote_name="${1:-unknown-remote}"
+remote_url="${2:-unknown-url}"
+refs_file="$(mktemp)"
+trap 'rm -f "$refs_file"' EXIT
+
+cat > "$refs_file"
+
+bash "$script_path" "$remote_name" "$remote_url" "$refs_file"
