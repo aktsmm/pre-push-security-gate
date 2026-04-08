@@ -21,6 +21,7 @@ timestamp="$(date +"%Y%m%d-%H%M%S")"
 log_file="$repo_root/logs/security-$timestamp.log"
 COPILOT_COMMAND=""
 COPILOT_KIND=""
+COPILOT_ADD_DIR="$repo_root"
 
 log() {
   printf '%s\n' "$1" >> "$log_file"
@@ -176,6 +177,10 @@ else
   warn_or_fail "Copilot CLI が見つかりません。standalone の 'copilot' コマンドをインストールしてください。"
 fi
 
+if [[ "$COPILOT_KIND" == "standalone" && "$COPILOT_COMMAND" == *.exe ]] && command -v cygpath >/dev/null 2>&1; then
+  COPILOT_ADD_DIR="$(cygpath -w "$repo_root")"
+fi
+
 refs_summary=""
 commits_payload=""
 changed_files=""
@@ -278,7 +283,7 @@ log "Changed files:"
 log "${changed_files:-none}"
 log "Prompt max chars: $MAX_PROMPT_CHARS"
 if [[ "$COPILOT_KIND" == "standalone" ]]; then
-  log "Copilot CLI command: $COPILOT_COMMAND -p <prompt> --silent --no-ask-user"
+  log "Copilot CLI command: $COPILOT_COMMAND -p <prompt> --silent --no-ask-user --add-dir $COPILOT_ADD_DIR"
 else
   log "Copilot CLI command: $COPILOT_COMMAND copilot -- -p <prompt>"
 fi
@@ -286,7 +291,7 @@ fi
 copilot_output=""
 copilot_status=0
 if [[ "$COPILOT_KIND" == "standalone" ]]; then
-  if ! copilot_output="$($COPILOT_COMMAND -p "$prompt" --silent --no-ask-user --add-dir "$repo_root" 2>&1)"; then
+  if ! copilot_output="$($COPILOT_COMMAND -p "$prompt" --silent --no-ask-user --add-dir "$COPILOT_ADD_DIR" 2>&1)"; then
     copilot_status=$?
   fi
 else
