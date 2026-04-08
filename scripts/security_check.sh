@@ -309,7 +309,7 @@ log "$copilot_output"
 log "========================"
 
 if [[ "$copilot_status" -ne 0 ]]; then
-  warn_or_fail "gh copilot の実行に失敗しました。ログを確認してください: $log_file"
+  warn_or_fail "Copilot CLI の実行に失敗しました。ログを確認してください: $log_file"
 fi
 
 if grep -q 'SECURITY_CHECK: PASS' <<< "$copilot_output"; then
