@@ -269,11 +269,11 @@ log "$(printf '%b' "$refs_summary")"
 log "Changed files:"
 log "${changed_files:-none}"
 log "Prompt max chars: $MAX_PROMPT_CHARS"
-log "Copilot CLI command: $GH_COMMAND copilot -p <prompt>"
+log "Copilot CLI command: $GH_COMMAND copilot -- -p <prompt>"
 
 copilot_output=""
 copilot_status=0
-if ! copilot_output="$($GH_COMMAND copilot -p "$prompt" 2>&1)"; then
+if ! copilot_output="$($GH_COMMAND copilot -- -p "$prompt" 2>&1)"; then
   copilot_status=$?
 fi
 
