@@ -160,16 +160,16 @@ build_static_signals() {
 }
 
 if command -v copilot >/dev/null 2>&1; then
-  COPILOT_COMMAND="copilot"
+  COPILOT_COMMAND="$(command -v copilot)"
   COPILOT_KIND="standalone"
 elif command -v copilot.exe >/dev/null 2>&1; then
-  COPILOT_COMMAND="copilot.exe"
+  COPILOT_COMMAND="$(command -v copilot.exe)"
   COPILOT_KIND="standalone"
 elif command -v gh >/dev/null 2>&1; then
-  COPILOT_COMMAND="gh"
+  COPILOT_COMMAND="$(command -v gh)"
   COPILOT_KIND="gh-wrapper"
 elif command -v gh.exe >/dev/null 2>&1; then
-  COPILOT_COMMAND="gh.exe"
+  COPILOT_COMMAND="$(command -v gh.exe)"
   COPILOT_KIND="gh-wrapper"
 else
   log "Date: $(date '+%Y-%m-%d %H:%M:%S')"
