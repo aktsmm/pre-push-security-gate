@@ -19,6 +19,7 @@ FAIL_OPEN="${SECURITY_HOOK_FAIL_OPEN:-0}"
 mkdir -p "$repo_root/logs"
 timestamp="$(date +"%Y%m%d-%H%M%S")"
 log_file="$repo_root/logs/security-$timestamp.log"
+GH_COMMAND=""
 
 log() {
   printf '%s\n' "$1" >> "$log_file"
@@ -157,9 +158,15 @@ build_static_signals() {
 }
 
 if ! command -v gh >/dev/null 2>&1; then
-  log "Date: $(date '+%Y-%m-%d %H:%M:%S')"
-  log "Remote: $remote_name ($remote_url)"
-  warn_or_fail "gh CLI が見つかりません。GitHub CLI をインストールしてください。"
+  if command -v gh.exe >/dev/null 2>&1; then
+    GH_COMMAND="gh.exe"
+  else
+    log "Date: $(date '+%Y-%m-%d %H:%M:%S')"
+    log "Remote: $remote_name ($remote_url)"
+    warn_or_fail "gh CLI が見つかりません。GitHub CLI をインストールしてください。"
+  fi
+else
+  GH_COMMAND="gh"
 fi
 
 refs_summary=""
@@ -262,11 +269,11 @@ log "$(printf '%b' "$refs_summary")"
 log "Changed files:"
 log "${changed_files:-none}"
 log "Prompt max chars: $MAX_PROMPT_CHARS"
-log "Copilot CLI command: gh copilot -p <prompt>"
+log "Copilot CLI command: $GH_COMMAND copilot -p <prompt>"
 
 copilot_output=""
 copilot_status=0
-if ! copilot_output="$(gh copilot -p "$prompt" 2>&1)"; then
+if ! copilot_output="$($GH_COMMAND copilot -p "$prompt" 2>&1)"; then
   copilot_status=$?
 fi
 
