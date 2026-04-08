@@ -19,7 +19,8 @@ FAIL_OPEN="${SECURITY_HOOK_FAIL_OPEN:-0}"
 mkdir -p "$repo_root/logs"
 timestamp="$(date +"%Y%m%d-%H%M%S")"
 log_file="$repo_root/logs/security-$timestamp.log"
-GH_COMMAND=""
+COPILOT_COMMAND=""
+COPILOT_KIND=""
 
 log() {
   printf '%s\n' "$1" >> "$log_file"
@@ -157,16 +158,22 @@ build_static_signals() {
   printf '%b' "$findings"
 }
 
-if ! command -v gh >/dev/null 2>&1; then
-  if command -v gh.exe >/dev/null 2>&1; then
-    GH_COMMAND="gh.exe"
-  else
-    log "Date: $(date '+%Y-%m-%d %H:%M:%S')"
-    log "Remote: $remote_name ($remote_url)"
-    warn_or_fail "gh CLI が見つかりません。GitHub CLI をインストールしてください。"
-  fi
+if command -v copilot >/dev/null 2>&1; then
+  COPILOT_COMMAND="copilot"
+  COPILOT_KIND="standalone"
+elif command -v copilot.exe >/dev/null 2>&1; then
+  COPILOT_COMMAND="copilot.exe"
+  COPILOT_KIND="standalone"
+elif command -v gh >/dev/null 2>&1; then
+  COPILOT_COMMAND="gh"
+  COPILOT_KIND="gh-wrapper"
+elif command -v gh.exe >/dev/null 2>&1; then
+  COPILOT_COMMAND="gh.exe"
+  COPILOT_KIND="gh-wrapper"
 else
-  GH_COMMAND="gh"
+  log "Date: $(date '+%Y-%m-%d %H:%M:%S')"
+  log "Remote: $remote_name ($remote_url)"
+  warn_or_fail "Copilot CLI が見つかりません。standalone の 'copilot' コマンドをインストールしてください。"
 fi
 
 refs_summary=""
@@ -234,6 +241,7 @@ Review these categories at minimum:
 8. Sensitive information leakage or insecure defaults
 
 Respond in Japanese.
+Do not use tools. Review only the patch data provided in this prompt.
 If the patch is acceptable, include exactly one line containing: SECURITY_CHECK: PASS
 If the patch is not acceptable, include exactly one line containing: SECURITY_CHECK: FAIL
 
@@ -269,12 +277,22 @@ log "$(printf '%b' "$refs_summary")"
 log "Changed files:"
 log "${changed_files:-none}"
 log "Prompt max chars: $MAX_PROMPT_CHARS"
-log "Copilot CLI command: $GH_COMMAND copilot -- -p <prompt>"
+if [[ "$COPILOT_KIND" == "standalone" ]]; then
+  log "Copilot CLI command: $COPILOT_COMMAND -p <prompt> --silent --no-ask-user"
+else
+  log "Copilot CLI command: $COPILOT_COMMAND copilot -- -p <prompt>"
+fi
 
 copilot_output=""
 copilot_status=0
-if ! copilot_output="$($GH_COMMAND copilot -- -p "$prompt" 2>&1)"; then
-  copilot_status=$?
+if [[ "$COPILOT_KIND" == "standalone" ]]; then
+  if ! copilot_output="$($COPILOT_COMMAND -p "$prompt" --silent --no-ask-user --add-dir "$repo_root" 2>&1)"; then
+    copilot_status=$?
+  fi
+else
+  if ! copilot_output="$($COPILOT_COMMAND copilot -- -p "$prompt" 2>&1)"; then
+    copilot_status=$?
+  fi
 fi
 
 log "--- Copilot Output ---"
