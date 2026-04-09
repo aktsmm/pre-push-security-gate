@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">Pre-push Security Gate Architecture</title>
+  <desc id="desc">Architecture diagram for the pre-push security gate using a Git pre-push hook, PowerShell security review script, Copilot CLI, logs, and remote repository.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a5568" />
+    </marker>
+    <style>
+      .title { font: 700 28px Helvetica, Arial, sans-serif; fill: #1f2937; }
+      .subtitle { font: 14px Helvetica, Arial, sans-serif; fill: #475467; }
+      .group { fill: #f8fafc; stroke: #667085; stroke-width: 2; rx: 18; ry: 18; }
+      .group-title { font: 700 18px Helvetica, Arial, sans-serif; fill: #111827; }
+      .node { fill: #dbeafe; stroke: #3b82f6; stroke-width: 2; rx: 14; ry: 14; }
+      .node-warn { fill: #fef3c7; stroke: #d97706; stroke-width: 2; rx: 14; ry: 14; }
+      .node-external { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; rx: 14; ry: 14; }
+      .node-danger { fill: #fee2e2; stroke: #dc2626; stroke-width: 2; rx: 14; ry: 14; }
+      .node-success { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; rx: 14; ry: 14; }
+      .text { font: 13px Helvetica, Arial, sans-serif; fill: #0f172a; }
+      .text-small { font: 12px Helvetica, Arial, sans-serif; fill: #334155; }
+      .arrow { stroke: #4a5568; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="40" y="44" class="title">Pre-push Security Gate</text>
+  <text x="40" y="72" class="subtitle">Git hook entrypoint, PowerShell-first review engine, Copilot CLI decision, and real push validation</text>
+
+  <rect x="30" y="100" width="900" height="650" class="group" />
+  <text x="58" y="135" class="group-title">Local Repository</text>
+
+  <rect x="980" y="100" width="380" height="650" class="group" />
+  <text x="1008" y="135" class="group-title">External / Remote</text>
+
+  <rect x="70" y="180" width="150" height="76" class="node-success" />
+  <text x="96" y="212" class="text">Developer</text>
+  <text x="93" y="232" class="text-small">git push</text>
+
+  <rect x="280" y="170" width="190" height="92" class="node" />
+  <text x="313" y="204" class="text">hooks/pre-push</text>
+  <text x="304" y="224" class="text-small">bash entrypoint</text>
+  <text x="313" y="242" class="text-small">captures refs</text>
+
+  <rect x="530" y="165" width="220" height="102" class="node" />
+  <text x="560" y="198" class="text">security_check.ps1</text>
+  <text x="578" y="218" class="text-small">primary engine</text>
+  <text x="563" y="236" class="text-small">security_check.sh</text>
+  <text x="585" y="254" class="text-small">fallback</text>
+
+  <rect x="110" y="355" width="220" height="96" class="node" />
+  <text x="135" y="388" class="text">Commit collection</text>
+  <text x="132" y="408" class="text-small">git rev-list / git show</text>
+  <text x="126" y="426" class="text-small">handles HEAD push syntax</text>
+
+  <rect x="390" y="350" width="240" height="106" class="node-warn" />
+  <text x="420" y="384" class="text">Static signal scan</text>
+  <text x="419" y="404" class="text-small">regex pre-scan for secret,</text>
+  <text x="422" y="422" class="text-small">XSS, SSRF, command exec</text>
+  <text x="450" y="440" class="text-small">and auth issues</text>
+
+  <rect x="690" y="350" width="180" height="106" class="node-danger" />
+  <text x="723" y="388" class="text">Decision</text>
+  <text x="720" y="408" class="text-small">PASS or FAIL</text>
+  <text x="706" y="426" class="text-small">returned to Git</text>
+
+  <rect x="140" y="555" width="220" height="88" class="node-danger" />
+  <text x="185" y="590" class="text">logs/</text>
+  <text x="167" y="610" class="text-small">security-*.log</text>
+  <text x="145" y="628" class="text-small">pre-push-invoke-*.log</text>
+
+  <rect x="430" y="545" width="250" height="108" class="node" />
+  <text x="456" y="579" class="text">scripts/test-hook.ps1</text>
+  <text x="452" y="599" class="text-small">temporary worktree</text>
+  <text x="448" y="617" class="text-small">temporary bare remote</text>
+  <text x="469" y="635" class="text-small">real git push E2E</text>
+
+  <rect x="1045" y="170" width="250" height="112" class="node-external" />
+  <text x="1084" y="206" class="text">GitHub Copilot CLI</text>
+  <text x="1084" y="226" class="text-small">prompt with diff</text>
+  <text x="1069" y="244" class="text-small">and static findings</text>
+  <text x="1076" y="262" class="text-small">returns PASS / FAIL</text>
+
+  <rect x="1075" y="375" width="200" height="82" class="node-success" />
+  <text x="1133" y="409" class="text">Push allowed</text>
+  <text x="1118" y="429" class="text-small">Git continues</text>
+
+  <rect x="1060" y="545" width="240" height="92" class="node-external" />
+  <text x="1120" y="580" class="text">Remote repo</text>
+  <text x="1112" y="600" class="text-small">GitHub or local bare</text>
+
+  <path d="M220 218 L280 218" class="arrow" />
+  <path d="M470 218 L530 218" class="arrow" />
+  <path d="M640 267 L640 318 L220 318 L220 355" class="arrow" />
+  <path d="M330 403 L390 403" class="arrow" />
+  <path d="M630 403 L690 403" class="arrow" />
+  <path d="M750 267 L750 218 L1045 218" class="arrow" />
+  <path d="M1045 270 L900 270 L900 403 L870 403" class="arrow" />
+  <path d="M780 456 L780 586 L680 586" class="arrow" />
+  <path d="M690 403 L360 403 L360 599" class="arrow" />
+  <path d="M870 403 L1075 403" class="arrow" />
+  <path d="M1175 457 L1175 545" class="arrow" />
+  <path d="M690 403 L610 403 L610 545" class="arrow" />
+  <path d="M360 599 L430 599" class="arrow" />
+  <path d="M680 599 L1060 599" class="arrow" />
+
+  <text x="235" y="210" class="text-small">invoke hook</text>
+  <text x="478" y="210" class="text-small">choose engine</text>
+  <text x="254" y="340" class="text-small">collect pushed commits</text>
+  <text x="476" y="394" class="text-small">build prompt input</text>
+  <text x="927" y="257" class="text-small">AI review</text>
+  <text x="905" y="391" class="text-small">SECURITY_CHECK result</text>
+  <text x="1088" y="362" class="text-small">PASS path</text>
+  <text x="820" y="575" class="text-small">FAIL path → logs / stderr</text>
+  <text x="719" y="587" class="text-small">test harness</text>
+</svg>
