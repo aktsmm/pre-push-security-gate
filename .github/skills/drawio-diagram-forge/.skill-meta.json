@@ -1,0 +1,8 @@
+{
+  "name": "drawio-diagram-forge",
+  "source": "aktsmm-Agent-Skills",
+  "description": "Generate draw.io editable diagrams (.drawio, .drawio.svg) from text, images, or Excel. Orchestrates 3-agent workflow (Analysis → Manifest → SVG generation) with quality gates. Use when creating architecture diagrams, flowcharts, sequence diagrams, or converting existing images to editable format. Supports Azure/AWS cloud icons.",
+  "whenToUse": "Creating architecture diagrams (Azure, AWS); Converting flowcharts from text descriptions; Transforming images/screenshots into editable format; Generating swimlane, sequence diagrams",
+  "categories": [],
+  "installedAt": "2026-04-08T23:52:17.002Z"
+}
