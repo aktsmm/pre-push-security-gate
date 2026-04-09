@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
-  <title id="title">Pre-push Security Gate Architecture</title>
-  <desc id="desc">Architecture diagram for the pre-push security gate using a Git pre-push hook, local PowerShell security review script, local Copilot CLI process, logs, and remote repository.</desc>
+  <title id="title">Pre-push Security Gate Architecture Japanese</title>
+  <desc id="desc">日本語版の pre-push security gate アーキテクチャ図。ローカルの hook、PowerShell レビュー本体、ローカルの Copilot CLI、ログ、リモートリポジトリを示す。</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
       <path d="M0,0 L10,5 L0,10 z" fill="#4a5568" />
@@ -22,47 +22,47 @@
   </defs>
 
   <text x="40" y="44" class="title">Pre-push Security Gate</text>
-  <text x="40" y="72" class="subtitle">Straightened main flow with local review engine, local Copilot CLI, and separate PASS/FAIL paths</text>
+  <text x="40" y="72" class="subtitle">日本語版: 主経路を一直線にし、PASS / FAIL とテスト経路を分離した構成</text>
 
   <rect x="30" y="100" width="1020" height="650" class="group" />
-  <text x="58" y="135" class="group-title">Local Repository</text>
+  <text x="58" y="135" class="group-title">ローカルリポジトリ</text>
 
   <rect x="1100" y="100" width="300" height="650" class="group" />
-  <text x="1128" y="135" class="group-title">Remote</text>
+  <text x="1128" y="135" class="group-title">リモート</text>
 
   <rect x="70" y="210" width="120" height="60" class="node-success" />
-  <text x="96" y="242" class="text">Developer</text>
+  <text x="101" y="242" class="text">開発者</text>
   <text x="93" y="262" class="text-small">git push</text>
 
   <rect x="240" y="195" width="170" height="82" class="node" />
   <text x="272" y="230" class="text">hooks/pre-push</text>
-  <text x="291" y="250" class="text-small">captures refs</text>
+  <text x="293" y="250" class="text-small">ref を受け取る</text>
 
   <rect x="460" y="190" width="220" height="92" class="node" />
-  <text x="490" y="224" class="text">scripts/security_check.ps1</text>
-  <text x="507" y="244" class="text-small">PowerShell 7 primary</text>
-  <text x="494" y="262" class="text-small">security_check.sh fallback</text>
+  <text x="474" y="224" class="text">scripts/security_check.ps1</text>
+  <text x="508" y="244" class="text-small">PowerShell 7 正本</text>
+  <text x="482" y="262" class="text-small">security_check.sh は fallback</text>
 
   <rect x="740" y="200" width="180" height="72" class="node-external" />
   <text x="772" y="235" class="text">GitHub Copilot CLI</text>
-  <text x="797" y="255" class="text-small">local process</text>
+  <text x="788" y="255" class="text-small">ローカルプロセス</text>
 
   <rect x="970" y="192" width="140" height="88" class="node-warn" />
-  <text x="994" y="228" class="text">Decision</text>
-  <text x="989" y="248" class="text-small">PASS or FAIL</text>
+  <text x="1005" y="228" class="text">判定</text>
+  <text x="986" y="248" class="text-small">PASS / FAIL</text>
 
   <rect x="470" y="380" width="200" height="82" class="node" />
-  <text x="500" y="414" class="text">Commit collection</text>
-  <text x="507" y="434" class="text-small">git rev-list / git show</text>
+  <text x="505" y="414" class="text">コミット収集</text>
+  <text x="493" y="434" class="text-small">git rev-list / git show</text>
 
   <rect x="720" y="370" width="220" height="98" class="node-warn" />
-  <text x="760" y="406" class="text">Static signal scan</text>
-  <text x="746" y="426" class="text-small">secret / XSS / SSRF /</text>
-  <text x="774" y="444" class="text-small">command exec</text>
+  <text x="756" y="406" class="text">静的シグナル抽出</text>
+  <text x="744" y="426" class="text-small">secret / XSS / SSRF /</text>
+  <text x="775" y="444" class="text-small">command exec</text>
 
   <rect x="190" y="540" width="220" height="90" class="node" />
   <text x="217" y="575" class="text">scripts/test-hook.ps1</text>
-  <text x="228" y="595" class="text-small">real git push E2E</text>
+  <text x="233" y="595" class="text-small">実 git push の E2E</text>
 
   <rect x="960" y="540" width="170" height="88" class="node-danger" />
   <text x="1016" y="575" class="text">logs/</text>
@@ -70,12 +70,12 @@
   <text x="970" y="613" class="text-small">pre-push-invoke-*.log</text>
 
   <rect x="1165" y="210" width="170" height="70" class="node-success" />
-  <text x="1215" y="243" class="text">Push allowed</text>
-  <text x="1208" y="263" class="text-small">Git continues</text>
+  <text x="1212" y="243" class="text">push 継続</text>
+  <text x="1208" y="263" class="text-small">Git が続行</text>
 
   <rect x="1150" y="400" width="200" height="84" class="node-external" />
-  <text x="1201" y="435" class="text">Remote repository</text>
-  <text x="1198" y="455" class="text-small">GitHub or local bare</text>
+  <text x="1187" y="435" class="text">リモートリポジトリ</text>
+  <text x="1186" y="455" class="text-small">GitHub / local bare</text>
 
   <path d="M190 240 L240 240" class="arrow" />
   <path d="M410 236 L460 236" class="arrow" />
@@ -88,14 +88,14 @@
   <path d="M1040 280 L1040 540" class="arrow" />
   <path d="M300 540 L300 270" class="arrow" />
 
-  <text x="202" y="228" class="text-small">invoke hook</text>
-  <text x="419" y="224" class="text-small">run review</text>
-  <text x="686" y="224" class="text-small">local prompt</text>
-  <text x="924" y="224" class="text-small">result</text>
+  <text x="200" y="228" class="text-small">hook 起動</text>
+  <text x="419" y="224" class="text-small">レビュー実行</text>
+  <text x="690" y="224" class="text-small">ローカル prompt</text>
+  <text x="930" y="224" class="text-small">判定結果</text>
   <text x="1118" y="224" class="text-small">PASS</text>
-  <text x="1260" y="344" class="text-small">remote update</text>
-  <text x="582" y="336" class="text-small">collect commits</text>
-  <text x="844" y="336" class="text-small">static signals</text>
-  <text x="1050" y="398" class="text-small">FAIL → logs / stderr</text>
-  <text x="312" y="404" class="text-small">simulates push</text>
+  <text x="1260" y="344" class="text-small">remote 更新</text>
+  <text x="584" y="336" class="text-small">コミット収集</text>
+  <text x="842" y="336" class="text-small">静的シグナル</text>
+  <text x="1048" y="398" class="text-small">FAIL → logs / stderr</text>
+  <text x="312" y="404" class="text-small">実 push を再現</text>
 </svg>

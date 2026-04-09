@@ -1,0 +1,84 @@
+<mxfile host="app.diagrams.net" agent="GitHub Copilot" version="24.7.17" type="device">
+  <diagram id="pre-push-security-gate-architecture-ja" name="Architecture-JA">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="group-local" value="ローカルリポジトリ" style="swimlane;horizontal=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1020" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="group-remote" value="リモート" style="swimlane;horizontal=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="40" width="300" height="640" as="geometry" />
+        </mxCell>
+
+        <mxCell id="developer" value="開発者&#xa;git push" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="40" y="110" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hook" value="hooks/pre-push&#xa;ref を受け取る" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="210" y="95" width="170" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="engine" value="scripts/security_check.ps1&#xa;PowerShell 7 正本&#xa;security_check.sh は fallback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="460" y="190" width="220" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="copilot" value="GitHub Copilot CLI&#xa;ローカルプロセス" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="740" y="200" width="180" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="decision" value="判定&#xa;PASS / FAIL" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="970" y="192" width="140" height="88" as="geometry" />
+        </mxCell>
+
+        <mxCell id="collect" value="コミット収集&#xa;git rev-list / git show" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="470" y="380" width="200" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="scan" value="静的シグナル抽出&#xa;secret / XSS / SSRF / command exec" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="720" y="370" width="220" height="98" as="geometry" />
+        </mxCell>
+
+        <mxCell id="test" value="scripts/test-hook.ps1&#xa;実 git push の E2E" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="190" y="540" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="logs" value="logs/&#xa;security-*.log&#xa;pre-push-invoke-*.log" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="group-local">
+          <mxGeometry x="960" y="540" width="170" height="88" as="geometry" />
+        </mxCell>
+
+        <mxCell id="allow" value="push 継続&#xa;Git が続行" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="group-remote">
+          <mxGeometry x="60" y="110" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="remote" value="リモートリポジトリ&#xa;GitHub / local bare" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontSize=12;" vertex="1" parent="group-remote">
+          <mxGeometry x="45" y="300" width="200" height="84" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="developer" target="hook">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="レビュー起動" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="hook" target="engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="差分とシグナルを渡す" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="engine" target="copilot">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="SECURITY_CHECK 結果" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="copilot" target="decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="PASS" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="decision" target="allow">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="remote 更新" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="allow" target="remote">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="コミット収集" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="collect" target="engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="静的シグナル" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="scan" target="engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="FAIL → logs / stderr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="decision" target="logs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="実 push を再現" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="test" target="developer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
