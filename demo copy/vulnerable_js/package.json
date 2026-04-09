@@ -1,0 +1,13 @@
+{
+  "name": "vulnerable-js-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Intentionally vulnerable Express app for pre-push security hook demos.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
